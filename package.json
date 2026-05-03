@@ -1,0 +1,40 @@
+{
+  "name": "mcptrace",
+  "version": "0.0.1",
+  "description": "Transparent stdio proxy for MCP servers. Live timeline, SQLite log, replay. Zero config.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Jay Doshi",
+  "main": "./dist/cli.js",
+  "bin": {
+    "mcptrace": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "lint": "biome check src test",
+    "format": "biome format --write src test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "observability",
+    "debugger",
+    "proxy",
+    "json-rpc"
+  ],
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.9.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
