@@ -31,6 +31,10 @@ export class Proxy extends EventEmitter {
       }
     });
 
+    process.stdin.on("end", () => {
+      child.stdin.end();
+    });
+
     child.stdout.on("data", (chunk: Buffer) => {
       process.stdout.write(chunk);
       for (const f of this.fromServer.push(chunk)) {
