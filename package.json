@@ -34,12 +34,16 @@
     "json-rpc"
   ],
   "dependencies": {
-    "better-sqlite3": "^11.5.0"
+    "better-sqlite3": "^11.5.0",
+    "express": "^4.21.1",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/better-sqlite3": "^7.6.12",
+    "@types/express": "^5.0.0",
     "@types/node": "^22.9.0",
+    "@types/ws": "^8.5.13",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vitest": "^2.1.5"
