@@ -15,8 +15,11 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build:server && npm run build:dashboard",
+    "build:server": "tsc",
+    "build:dashboard": "vite build --config dashboard/vite.config.ts",
     "dev": "tsx src/cli.ts",
+    "dev:dashboard": "vite --config dashboard/vite.config.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "biome check src test",
@@ -43,9 +46,18 @@
     "@types/better-sqlite3": "^7.6.12",
     "@types/express": "^5.0.0",
     "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
     "@types/ws": "^8.5.13",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.15",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
+    "vite": "^5.4.11",
     "vitest": "^2.1.5"
   }
 }
