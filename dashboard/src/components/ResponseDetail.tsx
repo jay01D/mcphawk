@@ -1,5 +1,6 @@
 import type { LogRow } from "../types.ts";
 import { JsonTree } from "./JsonTree.tsx";
+import { ReplayPanel } from "./ReplayPanel.tsx";
 
 type Props = { row: LogRow | null };
 
@@ -36,8 +37,9 @@ export function ResponseDetail({ row }: Props) {
           <span>{new Date(row.ts).toLocaleString()}</span>
         </div>
       </div>
-      <div className="flex-1 overflow-auto p-5 font-mono text-sm">
+      <div className="flex-1 space-y-4 overflow-auto p-5 font-mono text-sm">
         <JsonTree value={payload} />
+        {row.kind === "request" && <ReplayPanel row={row} />}
       </div>
     </div>
   );

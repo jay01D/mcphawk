@@ -17,3 +17,16 @@ export type LogRow = {
 };
 
 export type WsEvent = { type: "row"; row: LogRow };
+
+export type ReplayOutcome = {
+  raw: string | null;
+  durationMs: number;
+  timedOut: boolean;
+  stderr: string;
+};
+
+export type ReplayResponse = {
+  request: LogRow;
+  original: LogRow | null;
+  replay: ReplayOutcome;
+};
