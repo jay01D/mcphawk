@@ -96,7 +96,12 @@ export async function run(argv: string[]): Promise<number> {
 
   let dashboard: Dashboard | null = null;
   if (args.dashboard) {
-    dashboard = await startDashboard({ port: args.port, logger });
+    dashboard = await startDashboard({
+      port: args.port,
+      logger,
+      wrappedCommand: args.command,
+      wrappedArgs: args.commandArgs,
+    });
     if (!args.quiet)
       process.stderr.write(`mcptrace dashboard: ${dashboard.url}\n`);
   }

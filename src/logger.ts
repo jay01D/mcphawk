@@ -50,6 +50,8 @@ export class Logger extends EventEmitter {
   private insertStmt: Statement;
   private recentStmt: Statement;
   private bySessionStmt: Statement;
+  private getByIdStmt: Statement;
+  private pairedResponseStmt: Statement;
   private sessionId: string;
 
   constructor(opts: LoggerOptions) {
@@ -71,6 +73,13 @@ export class Logger extends EventEmitter {
     );
     this.bySessionStmt = this.db.prepare(
       "SELECT * FROM messages WHERE session_id = ? ORDER BY id ASC",
+    );
+    this.getByIdStmt = this.db.prepare("SELECT * FROM messages WHERE id = ?");
+    this.pairedResponseStmt = this.db.prepare(
+      `SELECT * FROM messages
+        WHERE session_id = ? AND jsonrpc_id = ? AND kind = 'response'
+          AND direction = 'server_to_client' AND id > ?
+        ORDER BY id ASC LIMIT 1`,
     );
   }
 
@@ -116,6 +125,21 @@ export class Logger extends EventEmitter {
   bySession(sessionId: string): LogRow[] {
     const rows = this.bySessionStmt.all(sessionId) as RawRow[];
     return rows.map(toLogRow);
+  }
+
+  getRow(id: number): LogRow | null {
+    const r = this.getByIdStmt.get(id) as RawRow | undefined;
+    return r ? toLogRow(r) : null;
+  }
+
+  pairedResponse(req: LogRow): LogRow | null {
+    if (req.jsonrpcId === null) return null;
+    const r = this.pairedResponseStmt.get(
+      req.sessionId,
+      req.jsonrpcId,
+      req.id,
+    ) as RawRow | undefined;
+    return r ? toLogRow(r) : null;
   }
 
   close(): void {

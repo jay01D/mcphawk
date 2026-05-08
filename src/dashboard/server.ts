@@ -5,10 +5,13 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import { WebSocketServer, type WebSocket } from "ws";
 import type { Logger, LogRow } from "../logger.js";
+import { runReplay } from "../replay/runner.js";
 
 export type DashboardOptions = {
   port: number;
   logger: Logger;
+  wrappedCommand: string;
+  wrappedArgs: string[];
 };
 
 export type Dashboard = {
@@ -28,6 +31,7 @@ const placeholderHtml = `<!doctype html>
 
 export function startDashboard(opts: DashboardOptions): Promise<Dashboard> {
   const app = express();
+  app.use(express.json({ limit: "1mb" }));
 
   app.get("/api/messages", (req, res) => {
     const limit = clampLimit(req.query.limit);
@@ -37,6 +41,28 @@ export function startDashboard(opts: DashboardOptions): Promise<Dashboard> {
   app.get("/api/session/:id", (req, res) => {
     res.json({
       data: opts.logger.bySession(req.params.id),
+      error: null,
+      message: null,
+    });
+  });
+
+  app.post("/api/replay/:id", async (req, res) => {
+    const id = Number.parseInt(req.params.id ?? "", 10);
+    const row = Number.isFinite(id) ? opts.logger.getRow(id) : null;
+    if (!row || row.kind !== "request") {
+      res
+        .status(404)
+        .json({ data: null, error: "not_found", message: "request not found" });
+      return;
+    }
+    const original = opts.logger.pairedResponse(row);
+    const outcome = await runReplay({
+      command: opts.wrappedCommand,
+      args: opts.wrappedArgs,
+      request: row.raw,
+    });
+    res.json({
+      data: { request: row, original, replay: outcome },
       error: null,
       message: null,
     });
