@@ -4,10 +4,10 @@
   "description": "Transparent stdio proxy for MCP servers. Live timeline, SQLite log, replay. Zero config.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jaydoshi0109/mcptrace.git"
+    "url": "https://github.com/jay01D/mcptrace.git"
   },
-  "homepage": "https://github.com/jaydoshi0109/mcptrace#readme",
-  "bugs": "https://github.com/jaydoshi0109/mcptrace/issues",
+  "homepage": "https://github.com/jay01D/mcptrace#readme",
+  "bugs": "https://github.com/jay01D/mcptrace/issues",
   "type": "module",
   "license": "MIT",
   "author": "Jay Doshi",

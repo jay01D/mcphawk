@@ -135,7 +135,7 @@ The dashboard is a small Express server with a WebSocket that streams every logg
 ## Development
 
 ```bash
-git clone https://github.com/jaydoshi0109/mcptrace
+git clone https://github.com/jay01D/mcptrace
 cd mcptrace
 npm install
 npm run build
