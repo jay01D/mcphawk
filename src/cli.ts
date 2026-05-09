@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import { randomUUID } from "node:crypto";
+import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { type Dashboard, startDashboard } from "./dashboard/server.js";
+import { type ExportFormat, exportRows } from "./exporter.js";
 import type { Frame } from "./framing.js";
 import { Logger } from "./logger.js";
 import { type Direction, Proxy } from "./proxy.js";
@@ -24,6 +26,7 @@ export const HELP_TEXT = `mcptrace - transparent stdio proxy for MCP servers
 
 usage:
   mcptrace [options] -- <command> [args...]
+  mcptrace export [--format=json|otel] [--db <path>] [--session <id>] [--out <file>]
 
 options:
   --port <n>          dashboard port (default 4800)
@@ -38,6 +41,7 @@ examples:
   mcptrace -- node my-server.js
   mcptrace --port 5000 -- python my_server.py
   mcptrace --no-dashboard -- bun run server.ts
+  mcptrace export --format=otel --out trace.json
 `;
 
 export function parseArgs(argv: string[]): CliArgs {
@@ -87,6 +91,8 @@ export function parseArgs(argv: string[]): CliArgs {
 }
 
 export async function run(argv: string[]): Promise<number> {
+  if (argv[0] === "export") return runExport(argv.slice(1));
+
   let args: CliArgs;
   try {
     args = parseArgs(argv);
@@ -152,6 +158,44 @@ export async function run(argv: string[]): Promise<number> {
       done(code ?? 0);
     });
   });
+}
+
+function runExport(argv: string[]): number {
+  let format: ExportFormat = "json";
+  let dbPath = "./observe.db";
+  let sessionId: string | undefined;
+  let out: string | undefined;
+
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a === "--format") {
+      const v = argv[++i];
+      if (v !== "json" && v !== "otel")
+        throw new Error(`--format must be json or otel, got ${v}`);
+      format = v;
+    } else if (a?.startsWith("--format=")) {
+      const v = a.slice("--format=".length);
+      if (v !== "json" && v !== "otel")
+        throw new Error(`--format must be json or otel, got ${v}`);
+      format = v;
+    } else if (a === "--db") {
+      dbPath = argv[++i] ?? dbPath;
+    } else if (a === "--session") {
+      sessionId = argv[++i];
+    } else if (a === "--out") {
+      out = argv[++i];
+    } else if (a === "-h" || a === "--help") {
+      process.stdout.write(HELP_TEXT);
+      return 0;
+    } else {
+      throw new Error(`unknown export option: ${a}`);
+    }
+  }
+
+  const body = exportRows({ dbPath: resolve(dbPath), format, sessionId });
+  if (out) writeFileSync(resolve(out), body);
+  else process.stdout.write(`${body}\n`);
+  return 0;
 }
 
 const invokedAsScript =
