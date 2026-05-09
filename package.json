@@ -1,7 +1,13 @@
 {
   "name": "mcptrace",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Transparent stdio proxy for MCP servers. Live timeline, SQLite log, replay. Zero config.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jaydoshi0109/mcptrace.git"
+  },
+  "homepage": "https://github.com/jaydoshi0109/mcptrace#readme",
+  "bugs": "https://github.com/jaydoshi0109/mcptrace/issues",
   "type": "module",
   "license": "MIT",
   "author": "Jay Doshi",
@@ -23,7 +29,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "biome check src test",
-    "format": "biome format --write src test"
+    "format": "biome format --write src test",
+    "prepublishOnly": "npm run build && npm test"
   },
   "engines": {
     "node": ">=20"
