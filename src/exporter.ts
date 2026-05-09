@@ -122,8 +122,8 @@ function toOtlp(rows: LogRow[]): {
   return {
     resourceSpans: [
       {
-        resource: { attributes: [kv("service.name", "mcptrace")] },
-        scopeSpans: [{ scope: { name: "mcptrace" }, spans }],
+        resource: { attributes: [kv("service.name", "mcphawk")] },
+        scopeSpans: [{ scope: { name: "mcphawk" }, spans }],
       },
     ],
   };

@@ -21,7 +21,7 @@ export function App() {
       <header className="flex items-center justify-between border-b border-slate-800 px-6 py-3">
         <div className="flex items-center">
           <span className="font-mono text-lg font-semibold tracking-tight">
-            mcptrace
+            mcphawk
           </span>
           <ConnectionBadge state={state} />
         </div>
@@ -37,7 +37,7 @@ export function App() {
         <section className="overflow-y-auto border-r border-slate-800">
           {visible.length === 0 && (
             <div className="px-4 py-6 text-sm text-slate-500">
-              waiting for traffic… pipe an mcp client through mcptrace to start.
+              waiting for traffic… pipe an mcp client through mcphawk to start.
             </div>
           )}
           {visible.map((row) => (

@@ -11,7 +11,7 @@ let dir: string;
 let dbPath: string;
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), "mcptrace-int-"));
+  dir = mkdtempSync(join(tmpdir(), "mcphawk-int-"));
   dbPath = join(dir, "observe.db");
 });
 

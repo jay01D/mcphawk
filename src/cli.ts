@@ -22,11 +22,11 @@ export type CliArgs = {
   commandArgs: string[];
 };
 
-export const HELP_TEXT = `mcptrace - transparent stdio proxy for MCP servers
+export const HELP_TEXT = `mcphawk - transparent stdio proxy for MCP servers
 
 usage:
-  mcptrace [options] -- <command> [args...]
-  mcptrace export [--format=json|otel] [--db <path>] [--session <id>] [--out <file>]
+  mcphawk [options] -- <command> [args...]
+  mcphawk export [--format=json|otel] [--db <path>] [--session <id>] [--out <file>]
 
 options:
   --port <n>          dashboard port (default 4800)
@@ -38,10 +38,10 @@ options:
   -h, --help          show this help
 
 examples:
-  mcptrace -- node my-server.js
-  mcptrace --port 5000 -- python my_server.py
-  mcptrace --no-dashboard -- bun run server.ts
-  mcptrace export --format=otel --out trace.json
+  mcphawk -- node my-server.js
+  mcphawk --port 5000 -- python my_server.py
+  mcphawk --no-dashboard -- bun run server.ts
+  mcphawk export --format=otel --out trace.json
 `;
 
 export function parseArgs(argv: string[]): CliArgs {
@@ -97,7 +97,7 @@ export async function run(argv: string[]): Promise<number> {
   try {
     args = parseArgs(argv);
   } catch (err) {
-    process.stderr.write(`mcptrace: ${(err as Error).message}\n\n${HELP_TEXT}`);
+    process.stderr.write(`mcphawk: ${(err as Error).message}\n\n${HELP_TEXT}`);
     return 2;
   }
 
@@ -124,7 +124,7 @@ export async function run(argv: string[]): Promise<number> {
       wrappedArgs: args.commandArgs,
     });
     if (!args.quiet)
-      process.stderr.write(`mcptrace dashboard: ${dashboard.url}\n`);
+      process.stderr.write(`mcphawk dashboard: ${dashboard.url}\n`);
   }
 
   proxy.on("frame", (dir: Direction, frame: Frame) => {
@@ -132,7 +132,7 @@ export async function run(argv: string[]): Promise<number> {
     if (args.riskyCheck && dir === "client_to_server" && frame.kind === "msg") {
       const risks = inspectRequest(frame.msg);
       for (const r of risks) {
-        process.stderr.write(`mcptrace warn [${r.reason}]: ${r.detail}\n`);
+        process.stderr.write(`mcphawk warn [${r.reason}]: ${r.detail}\n`);
       }
     }
   });
@@ -204,7 +204,7 @@ if (invokedAsScript) {
   run(process.argv.slice(2)).then(
     (code) => process.exit(code),
     (err) => {
-      process.stderr.write(`mcptrace: ${(err as Error).message}\n`);
+      process.stderr.write(`mcphawk: ${(err as Error).message}\n`);
       process.exit(1);
     },
   );

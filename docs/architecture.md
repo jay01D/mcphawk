@@ -1,7 +1,7 @@
 # Architecture
 
 ```
-   MCP client                 mcptrace                 wrapped server
+   MCP client                 mcphawk                 wrapped server
   (Claude, etc.)               (this)                  (your code)
        │                          │                          │
        │  json-rpc on stdin       │                          │

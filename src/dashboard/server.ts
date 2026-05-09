@@ -23,9 +23,9 @@ const here = dirname(fileURLToPath(import.meta.url));
 const staticDir = resolve(here, "public");
 
 const placeholderHtml = `<!doctype html>
-<html><head><meta charset="utf-8"><title>mcptrace</title></head>
+<html><head><meta charset="utf-8"><title>mcphawk</title></head>
 <body style="font-family:system-ui;padding:2rem;color:#333">
-<h1>mcptrace</h1>
+<h1>mcphawk</h1>
 <p>Dashboard bundle missing. Run <code>npm run build</code>.</p>
 </body></html>`;
 

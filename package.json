@@ -1,19 +1,19 @@
 {
-  "name": "mcptrace",
+  "name": "mcphawk",
   "version": "1.0.0",
   "description": "Transparent stdio proxy for MCP servers. Live timeline, SQLite log, replay. Zero config.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jay01D/mcptrace.git"
+    "url": "git+https://github.com/jay01D/mcphawk.git"
   },
-  "homepage": "https://github.com/jay01D/mcptrace#readme",
-  "bugs": "https://github.com/jay01D/mcptrace/issues",
+  "homepage": "https://github.com/jay01D/mcphawk#readme",
+  "bugs": "https://github.com/jay01D/mcphawk/issues",
   "type": "module",
   "license": "MIT",
   "author": "Jay Doshi",
   "main": "./dist/cli.js",
   "bin": {
-    "mcptrace": "dist/cli.js"
+    "mcphawk": "dist/cli.js"
   },
   "files": [
     "dist",

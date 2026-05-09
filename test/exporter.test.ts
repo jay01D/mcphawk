@@ -10,7 +10,7 @@ let dir: string;
 let dbPath: string;
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), "mcptrace-exp-"));
+  dir = mkdtempSync(join(tmpdir(), "mcphawk-exp-"));
   dbPath = join(dir, "observe.db");
 });
 

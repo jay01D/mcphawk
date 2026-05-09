@@ -1,4 +1,4 @@
-# mcptrace
+# mcphawk
 
 Transparent stdio proxy for MCP servers. See every JSON-RPC call your agent makes, capture it to SQLite, and replay it later. Zero config. Works with any MCP server.
 
@@ -7,24 +7,24 @@ Think `mitmproxy`, but for the Model Context Protocol.
 ## Quickstart
 
 ```bash
-npx mcptrace -- node my-server.js
+npx mcphawk -- node my-server.js
 ```
 
 Then open <http://localhost:4800>.
 
-That's it — no SDK, no config file, no code change in the wrapped server. The MCP client (Claude, Cursor, etc.) talks to mcptrace as if it were the server, and the server runs unchanged.
+That's it — no SDK, no config file, no code change in the wrapped server. The MCP client (Claude, Cursor, etc.) talks to mcphawk as if it were the server, and the server runs unchanged.
 
 ## Install
 
 ```bash
-npm install -g mcptrace
+npm install -g mcphawk
 ```
 
-Requires Node 20+. Also runs under Bun (`bunx mcptrace ...`).
+Requires Node 20+. Also runs under Bun (`bunx mcphawk ...`).
 
 ## Use with Claude Desktop
 
-You almost certainly want to drop mcptrace in front of an MCP server you've already registered in Claude Desktop. Find the config:
+You almost certainly want to drop mcphawk in front of an MCP server you've already registered in Claude Desktop. Find the config:
 
 - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
@@ -49,7 +49,7 @@ After:
   "mcpServers": {
     "my-server": {
       "command": "npx",
-      "args": ["mcptrace", "--", "node", "/path/to/server.js"]
+      "args": ["mcphawk", "--", "node", "/path/to/server.js"]
     }
   }
 }
@@ -66,25 +66,25 @@ Same pattern works for Cursor, Continue, and anything else that spawns an MCP se
 - **SQLite log** — every frame persisted to `./observe.db`. Query with the `sqlite3` CLI or any client
 - **Secret redaction** — Bearer tokens, OpenAI/Anthropic keys, AWS keys, JWTs, and `password`/`api_key`/`token` JSON fields masked before they hit disk
 - **Risky-tool warnings** — flags `tools/call` invocations whose name or arguments look like `rm -rf`, `sudo`, `drop table`, etc.
-- **OTLP export** — `mcptrace export --format=otel` produces OpenTelemetry traces ready to ship to any backend that speaks OTLP
+- **OTLP export** — `mcphawk export --format=otel` produces OpenTelemetry traces ready to ship to any backend that speaks OTLP
 
 ## More examples
 
 ```bash
 # wrap a python server
-mcptrace -- python my_server.py
+mcphawk -- python my_server.py
 
 # wrap an npm-published server
-mcptrace -- npx -y @modelcontextprotocol/server-filesystem /Users/me/docs
+mcphawk -- npx -y @modelcontextprotocol/server-filesystem /Users/me/docs
 
 # wrap a bun script
-mcptrace -- bun run server.ts
+mcphawk -- bun run server.ts
 
 # log only, no dashboard
-mcptrace --no-dashboard -- node my-server.js
+mcphawk --no-dashboard -- node my-server.js
 
 # custom port and database path
-mcptrace --port 5001 --db ./debug.db -- node my-server.js
+mcphawk --port 5001 --db ./debug.db -- node my-server.js
 ```
 
 ## Options
@@ -101,12 +101,12 @@ mcptrace --port 5001 --db ./debug.db -- node my-server.js
 
 ## Export
 
-`mcptrace export` reads a database file and writes either a raw JSON array of rows or an OpenTelemetry OTLP trace JSON.
+`mcphawk export` reads a database file and writes either a raw JSON array of rows or an OpenTelemetry OTLP trace JSON.
 
 ```bash
-mcptrace export --format=json --out trace.json
-mcptrace export --format=otel --out trace.otlp.json
-mcptrace export --format=json --session <uuid>
+mcphawk export --format=json --out trace.json
+mcphawk export --format=otel --out trace.otlp.json
+mcphawk export --format=json --session <uuid>
 ```
 
 ## Query the SQLite log
@@ -121,7 +121,7 @@ A few starter queries live in [docs/sql-recipes.md](docs/sql-recipes.md).
 
 ## How it works
 
-mcptrace spawns the wrapped command as a child process with piped stdio. It reads from its own stdin (whatever the MCP client writes), parses newline-delimited JSON-RPC frames, logs them, and forwards each chunk unchanged to the child's stdin. Same flow in reverse for the child's stdout. Neither side notices the middleman.
+mcphawk spawns the wrapped command as a child process with piped stdio. It reads from its own stdin (whatever the MCP client writes), parses newline-delimited JSON-RPC frames, logs them, and forwards each chunk unchanged to the child's stdin. Same flow in reverse for the child's stdout. Neither side notices the middleman.
 
 The dashboard is a small Express server with a WebSocket that streams every logged row to a Vite/React UI. The replay engine spawns a fresh copy of the same wrapped command, writes the captured JSON-RPC request to its stdin, waits for a matching response on stdout, and returns both. No state from the original session leaks in.
 
@@ -135,8 +135,8 @@ The dashboard is a small Express server with a WebSocket that streams every logg
 ## Development
 
 ```bash
-git clone https://github.com/jay01D/mcptrace
-cd mcptrace
+git clone https://github.com/jay01D/mcphawk
+cd mcphawk
 npm install
 npm run build
 npm test
