@@ -2,6 +2,7 @@ import { EventEmitter } from "node:events";
 import Database, { type Database as DB, type Statement } from "better-sqlite3";
 import type { Frame } from "./framing.js";
 import type { Direction } from "./proxy.js";
+import type { Redactor } from "./redact.js";
 import { classify } from "./semconv.js";
 
 export type LogRow = {
@@ -22,6 +23,7 @@ export type LogRow = {
 export type LoggerOptions = {
   dbPath: string;
   sessionId: string;
+  redactor?: Redactor;
 };
 
 const SCHEMA = `
@@ -53,10 +55,12 @@ export class Logger extends EventEmitter {
   private getByIdStmt: Statement;
   private pairedResponseStmt: Statement;
   private sessionId: string;
+  private redactor: Redactor | null;
 
   constructor(opts: LoggerOptions) {
     super();
     this.sessionId = opts.sessionId;
+    this.redactor = opts.redactor ?? null;
     this.db = new Database(opts.dbPath);
     this.db.pragma("journal_mode = WAL");
     this.db.pragma("synchronous = NORMAL");
@@ -96,7 +100,7 @@ export class Logger extends EventEmitter {
       isError: c.isError ? 1 : 0,
       errorCode: c.errorCode,
       errorMessage: c.errorMessage,
-      raw: frame.raw,
+      raw: this.redactor ? this.redactor.apply(frame.raw) : frame.raw,
     };
     const info = this.insertStmt.run(row);
     const out: LogRow = {

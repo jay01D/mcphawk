@@ -5,12 +5,16 @@ import { type Dashboard, startDashboard } from "./dashboard/server.js";
 import type { Frame } from "./framing.js";
 import { Logger } from "./logger.js";
 import { type Direction, Proxy } from "./proxy.js";
+import { Redactor } from "./redact.js";
+import { inspectRequest } from "./risky.js";
 
 export type CliArgs = {
   port: number;
   dbPath: string;
   dashboard: boolean;
   quiet: boolean;
+  redact: boolean;
+  riskyCheck: boolean;
   help: boolean;
   command: string | null;
   commandArgs: string[];
@@ -22,11 +26,13 @@ usage:
   mcptrace [options] -- <command> [args...]
 
 options:
-  --port <n>        dashboard port (default 4800)
-  --db <path>       sqlite path (default ./observe.db)
-  --no-dashboard    skip the dashboard, log only
-  --quiet           suppress info logs
-  -h, --help        show this help
+  --port <n>          dashboard port (default 4800)
+  --db <path>         sqlite path (default ./observe.db)
+  --no-dashboard      skip the dashboard, log only
+  --no-redact         disable secret redaction before storage
+  --no-risky-check    silence risky tool/argument warnings
+  --quiet             suppress info logs
+  -h, --help          show this help
 
 examples:
   mcptrace -- node my-server.js
@@ -40,6 +46,8 @@ export function parseArgs(argv: string[]): CliArgs {
     dbPath: "./observe.db",
     dashboard: true,
     quiet: false,
+    redact: true,
+    riskyCheck: true,
     help: false,
     command: null,
     commandArgs: [],
@@ -53,6 +61,8 @@ export function parseArgs(argv: string[]): CliArgs {
     const a = opts[i];
     if (a === "-h" || a === "--help") out.help = true;
     else if (a === "--no-dashboard") out.dashboard = false;
+    else if (a === "--no-redact") out.redact = false;
+    else if (a === "--no-risky-check") out.riskyCheck = false;
     else if (a === "--quiet") out.quiet = true;
     else if (a === "--port") {
       const v = opts[++i];
@@ -91,7 +101,12 @@ export async function run(argv: string[]): Promise<number> {
   }
 
   const sessionId = randomUUID();
-  const logger = new Logger({ dbPath: resolve(args.dbPath), sessionId });
+  const redactor = args.redact ? new Redactor() : undefined;
+  const logger = new Logger({
+    dbPath: resolve(args.dbPath),
+    sessionId,
+    redactor,
+  });
   const proxy = new Proxy();
 
   let dashboard: Dashboard | null = null;
@@ -108,6 +123,12 @@ export async function run(argv: string[]): Promise<number> {
 
   proxy.on("frame", (dir: Direction, frame: Frame) => {
     logger.record(dir, frame);
+    if (args.riskyCheck && dir === "client_to_server" && frame.kind === "msg") {
+      const risks = inspectRequest(frame.msg);
+      for (const r of risks) {
+        process.stderr.write(`mcptrace warn [${r.reason}]: ${r.detail}\n`);
+      }
+    }
   });
 
   const child = proxy.start({ command: args.command, args: args.commandArgs });
