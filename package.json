@@ -1,6 +1,6 @@
 {
   "name": "mcphawk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Transparent stdio proxy for MCP servers. Live timeline, SQLite log, replay. Zero config.",
   "repository": {
     "type": "git",

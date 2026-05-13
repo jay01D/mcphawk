@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { randomUUID } from "node:crypto";
-import { writeFileSync } from "node:fs";
+import { realpathSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { type Dashboard, startDashboard } from "./dashboard/server.js";
 import { type ExportFormat, exportRows } from "./exporter.js";
@@ -198,9 +198,7 @@ function runExport(argv: string[]): number {
   return 0;
 }
 
-const invokedAsScript =
-  process.argv[1]?.endsWith("cli.js") || process.argv[1]?.endsWith("cli.ts");
-if (invokedAsScript) {
+if (isMainModule()) {
   run(process.argv.slice(2)).then(
     (code) => process.exit(code),
     (err) => {
@@ -208,4 +206,16 @@ if (invokedAsScript) {
       process.exit(1);
     },
   );
+}
+
+function isMainModule(): boolean {
+  const argv1 = process.argv[1];
+  if (!argv1) return false;
+  try {
+    const here = new URL(import.meta.url).pathname;
+    const invoked = realpathSync(argv1);
+    return invoked === here || invoked === realpathSync(here);
+  } catch {
+    return argv1.endsWith("cli.js") || argv1.endsWith("cli.ts");
+  }
 }
